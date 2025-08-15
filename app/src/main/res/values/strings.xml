@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">QRCodder</string>
+    <string name="please_select_a_qrcode_to_scan">Please select a QRCode from gallery or use camera
+        to take a photo to scan</string>
+    <string name="search_image">Search image</string>
+    <string name="the_selected_qr_code_cannot_be_read">The selected QR Code cannot be read</string>
+    <string name="copy">Copy</string>
+    <string name="qr_code">QR Code</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="qr_code_not_recognized">QR Code not recognized</string>
+    <string name="close">Close</string>
+    <string name="menu">Menu</string>
+    <string name="nothing_here">Nothing here</string>
+    <string name="copy_content">Copy content</string>
+    <string name="generate_qr_code">Generate QR Code</string>
+    <string name="from_gallery">From Gallery</string>
+    <string name="from_camera">From Camera</string>
+    <string name="unable_to_generate_the_qr_code">Unable to generate the QR Code</string>
+    <string name="save">Save</string>
+    <string name="qr_code_data">QR Code data (Read-only)</string>
+    <string name="qr_code_raw_values">QR Code raw values (Edit-mode)</string>
+</resources>

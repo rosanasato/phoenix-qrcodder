@@ -1,9 +1,11 @@
 # Gradle files
 .gradle/
-build/
+**/build/
+gradle.properties
 
 # Local configuration file (sdk path, etc)
 local.properties
+Thumbs.db
 
 # Log/OS Files
 *.log
@@ -14,7 +16,11 @@ captures/
 .cxx/
 *.aab
 *.apk
+*.ap_
+*.apks 
 output-metadata.json
+bin/
+gen/
 
 # IntelliJ
 *.iml
@@ -32,3 +38,10 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Kotlin specific
+.kotlin/
+
+# Files for the Dalvik VM
+*.dex
+
