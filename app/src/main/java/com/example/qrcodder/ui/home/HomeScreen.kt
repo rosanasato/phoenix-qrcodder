@@ -166,35 +166,28 @@ fun ResultContent(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
+        modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
         verticalArrangement = Arrangement.Top
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top
-        ) {
-            // TextField to show formatted data
-            OutlinedTextField(
-                value = result.first,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.qr_code_data)) },
-                modifier = Modifier.fillMaxSize(),
-                readOnly = true
-            )
-            Spacer(Modifier.size(8.dp))
+        // TextField to show formatted data
+        OutlinedTextField(
+            value = result.first,
+            onValueChange = {},
+            label = { Text(stringResource(R.string.qr_code_data)) },
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
+        )
+        Spacer(Modifier.size(8.dp))
 
-            // TextField to show raw values
-            OutlinedTextField(
-                value = textFieldRawValue,
-                onValueChange = { textFieldRawValue = it },
-                label = { Text(stringResource(R.string.qr_code_raw_values)) },
-                modifier = Modifier.fillMaxSize(),
-                readOnly = false
-            )
-            Spacer(Modifier.size(8.dp))
-        }
+        // TextField to show raw values
+        OutlinedTextField(
+            value = textFieldRawValue,
+            onValueChange = { textFieldRawValue = it },
+            label = { Text(stringResource(R.string.qr_code_raw_values)) },
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = false
+        )
+        Spacer(Modifier.size(8.dp))
 
         // Buttons to copy e generate QR Code
         Row(
@@ -232,4 +225,3 @@ fun ResultContent(
         }
     }
 }
-
