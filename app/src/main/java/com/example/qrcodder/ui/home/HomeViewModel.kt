@@ -45,6 +45,12 @@ class HomeViewModel(
      */
     fun getFormattedQrCodeString(qrCode: QrCodeTypes?): Pair<String, String> {
         return when (qrCode) {
+            is QrCodeTypes.Email -> {
+                Pair(first = "Type: ${qrCode.type} \nTo: ${qrCode.address} \nSubject: ${qrCode.subject} \nBody: ${qrCode.body}",
+                    second = "${qrCode.rawValue}") }
+            is QrCodeTypes.Text -> {
+                Pair(first = "Text: ${qrCode.rawValue}",
+                    second = "${qrCode.rawValue}") }
             is QrCodeTypes.Url -> {
                 Pair(first = "Title: ${qrCode.title.toString()} \nURL: ${qrCode.url.toString()}",
                     second = "${qrCode.rawValue}") }
@@ -73,8 +79,10 @@ class HomeViewModel(
 
         val options = BarcodeScannerOptions.Builder()
             .setBarcodeFormats(
-                Barcode.FORMAT_QR_CODE
+                //Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_ALL_FORMATS
             )
+            .enableAllPotentialBarcodes()
             .build()
 
         try {
@@ -86,7 +94,7 @@ class HomeViewModel(
 
             Log.d(TAG, "HomeViewModel: Generated InputImage: ${image}")
 
-            val scanner = BarcodeScanning.getClient()
+            val scanner = BarcodeScanning.getClient(options)
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
@@ -97,8 +105,9 @@ class HomeViewModel(
                         Log.d(TAG, "HomeViewModel: QR Code not recognized: ${imageUri}. Barcode size: ${barcodes.size}")
                     } else {
                         for (barcode in barcodes) {
-                            _uiState.update {  HomeUiState.Success(getQrCodeValueType(barcode)) }
+                            _uiState.update { HomeUiState.Success(getQrCodeValueType(barcode)) }
 
+                            Log.d(TAG, "HomeViewModel: QR Code format: ${barcode.format}")
                             Log.d(TAG, "HomeViewModel: QR Code value type: ${barcode.valueType}")
                             Log.d(TAG, "HomeViewModel: QR Code raw value: ${barcode.rawValue}")
                             Log.d(TAG, "HomeViewModel: uiState: ${_uiState.value}")
@@ -153,14 +162,22 @@ class HomeViewModel(
     private fun getQrCodeValueType(barcode: Barcode): QrCodeTypes? {
         val barcode =
         when (barcode.valueType) {
-            Barcode.TYPE_UNKNOWN -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_CONTACT_INFO -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_EMAIL -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_ISBN -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_PHONE -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_PRODUCT -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_SMS -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_TEXT -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
+            Barcode.TYPE_UNKNOWN -> QrCodeTypes.Unknown("QR Code not recognized", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_CONTACT_INFO -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_EMAIL -> { barcode.let{
+                QrCodeTypes.Email(
+                    type = it.email?.type.toString(),
+                    body = it.email?.body,
+                    address = it.email?.address,
+                    subject = it.email?.subject,
+                    rawValue = it.rawValue
+                )
+            } }
+            Barcode.TYPE_ISBN -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_PHONE -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_PRODUCT -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_SMS -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_TEXT -> QrCodeTypes.Text(rawValue = barcode.rawValue)
             Barcode.TYPE_URL -> { barcode.let{
                 QrCodeTypes.Url(
                     url = it.url?.url,
@@ -176,12 +193,11 @@ class HomeViewModel(
                     rawValue = it.rawValue
                 )
             } }
-            Barcode.TYPE_GEO -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_CALENDAR_EVENT -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            Barcode.TYPE_DRIVER_LICENSE -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
-            else -> QrCodeTypes.Unknown("QR Code not recognized", "QR Code not recognized")
+            Barcode.TYPE_GEO -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_CALENDAR_EVENT -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            Barcode.TYPE_DRIVER_LICENSE -> QrCodeTypes.Unknown("QR Code not supported yet", "Raw value: ${barcode.rawValue}")
+            else -> QrCodeTypes.Unknown("QR Code not recognized", "Raw value: ${barcode.rawValue}")
         }
-
         return barcode
     }
 

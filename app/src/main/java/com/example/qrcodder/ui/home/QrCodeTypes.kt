@@ -13,7 +13,9 @@ sealed interface QrCodeTypes {
                            val organization: String?,
                            val urls: String?,
                            val rawValue: String?) : QrCodeTypes
+    data class Email(val type: String?, val address: String?, val subject: String?, val body: String?, val rawValue: String?) : QrCodeTypes
     data class Wifi(val encryptionType: Int?, val ssid: String?, val password: String?, val rawValue: String?) : QrCodeTypes
     data class Url(val url: String?, val title: String?, val rawValue: String?) : QrCodeTypes
+    data class Text(val rawValue: String?) : QrCodeTypes
     data class Unknown(val text: String,  val rawValue: String) : QrCodeTypes
 }
