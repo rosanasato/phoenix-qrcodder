@@ -41,7 +41,16 @@ android {
 
 dependencies {
 
+    // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+
+    // CameraX Dependencies
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
     implementation ("com.google.zxing:core:3.5.1")
 
     implementation(libs.androidx.core.ktx)

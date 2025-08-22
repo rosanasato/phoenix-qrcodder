@@ -17,6 +17,8 @@ import com.example.qrcodder.R
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
@@ -73,7 +75,7 @@ class HomeViewModel(
     /**
      * Reads the selected QR Code
      */
-    suspend fun readQrCodeAsync(imageUri: Uri, context: Context) = withContext(dispatcher) {
+    suspend fun readQrCodeFromGallery(imageUri: Uri, context: Context) = withContext(dispatcher) {
 
         // TODO How to handle ANR exception correctly?
 
@@ -199,6 +201,33 @@ class HomeViewModel(
             else -> QrCodeTypes.Unknown("QR Code not recognized", "Raw value: ${barcode.rawValue}")
         }
         return barcode
+    }
+
+    /**
+     * Read a QR Code directly from camera
+     */
+    fun readQrCodeFromCamera(context: Context) {
+        val options = GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+            .enableAutoZoom() // available on 16.1.0 and higher
+            .build()
+
+        val scanner = GmsBarcodeScanning.getClient(context, options)
+
+        _uiState.update { HomeUiState.Loading }
+
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                _uiState.update { HomeUiState.Success(getQrCodeValueType(barcode)) }
+                Log.d(TAG, "HomeViewModel: Read image from camera: ${barcode.rawValue}")
+            }
+            .addOnCanceledListener {
+                // Task canceled
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+            }
+
     }
 
     companion object {

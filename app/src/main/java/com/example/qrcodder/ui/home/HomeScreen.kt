@@ -77,7 +77,7 @@ fun HomeScreen(
     val context = LocalContext.current
 
     //Log.d("QrCodderApp- HomeScreen","isPhotoPickerAvailable: ${isPhotoPickerAvailable()}")
-    LaunchedEffect(selectedImage) { selectedImage?.let { viewModel.readQrCodeAsync(selectedImage!!, context) } }
+    LaunchedEffect(selectedImage) { selectedImage?.let { viewModel.readQrCodeFromGallery(selectedImage!!, context) } }
 
     // Registers a photo picker activity launcher in single-select mode.
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -95,7 +95,8 @@ fun HomeScreen(
         SearchPanel(
             context = context,
             onGalleryButtonClick = { photoPickerLauncher.launch(
-            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+            onCameraButtonClick = { viewModel.readQrCodeFromCamera(context) }
         )
 
         when (uiState) {

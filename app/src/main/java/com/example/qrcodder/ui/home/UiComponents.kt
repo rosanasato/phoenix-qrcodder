@@ -50,6 +50,7 @@ fun WaitingContent(modifier: Modifier = Modifier) {
 fun SearchPanel(
     context: Context,
     onGalleryButtonClick: () -> Unit,
+    onCameraButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -64,7 +65,7 @@ fun SearchPanel(
 
         // TODO Create method to open camera and scan QR Code
         Button(
-            onClick = { Toast.makeText(context,"Coming soon... Capture QR Code from camera.", Toast.LENGTH_SHORT).show() }
+            onClick = { onCameraButtonClick() }
         ) {
             Text(stringResource(R.string.from_camera))
         }
