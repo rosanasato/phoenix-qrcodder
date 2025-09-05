@@ -1,12 +1,9 @@
 package com.example.qrcodder.ui.home
 
+import android.content.ClipData
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
-import android.os.ext.SdkExtensions
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -24,8 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -38,34 +33,25 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.qrcodder.R
 import com.example.qrcodder.ui.AppViewModelProvider
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -120,10 +106,11 @@ fun ResultContent(
     modifier: Modifier = Modifier
 ) {
     var textFieldRawValue by remember { mutableStateOf(TextFieldValue(result.second)) }
-    val clipboardManager = LocalClipboardManager.current
+    val clipboardManager = LocalClipboard.current
     var showDialog by remember { mutableStateOf(false) }
     var qrCode by remember { mutableStateOf<Painter?>(null) }
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
     // Dialog to show the generated QR Code
     if (showDialog) {
@@ -201,8 +188,20 @@ fun ResultContent(
                     textFieldRawValue = textFieldRawValue.copy(
                         selection = TextRange(0, textFieldRawValue.text.length)
                     )
-                    clipboardManager.setText(AnnotatedString(textFieldRawValue.text))
-                    Toast.makeText(context, context.getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+
+                    // Using native clipboard
+//                    val clipData = ClipData.newPlainText("", textFieldRawValue.text)
+//                    clipboardManager.nativeClipboard.setPrimaryClip(clipData)
+
+                    // Using the new Clipboard Interface
+                    val clipEntry = ClipData.newPlainText("", textFieldRawValue.text).toClipEntry()
+                    coroutineScope.launch {
+                        clipboardManager.setClipEntry(clipEntry)
+
+                        // Only show a toast for Android 12 and lower.
+                        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+                            Toast.makeText(context, context.getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+                    }
                 }
             ) {
                 Icon(
